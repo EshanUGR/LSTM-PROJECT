@@ -11,7 +11,7 @@ export default function Home() {
       {/* 1. Hero Section */}
       <main className="flex-grow flex flex-col items-center justify-center text-center px-4">
         <h1 className="text-5xl font-bold text-gray-900 mb-6">
-          Welcome to <span className="text-blue-600">Akila Library</span>
+          Welcome to <span className="text-blue-600">Ravindu Library</span>
         </h1>
 
         <p className="text-xl text-gray-600 max-w-2xl mb-10">
@@ -76,7 +76,7 @@ export default function Home() {
       </main>
 
       <footer className="bg-gray-800 text-white py-6 text-center">
-        <p>&copy; 2025 Akila Suppliers. All rights reserved.</p>
+        <p>&copy; 2025 Ravindu Library. All rights reserved.</p>
       </footer>
     </div>
   );
