@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Used to redirect after success
+import { useRouter } from "next/navigation";
+import { authService } from "../lib/api"; // <--- 1. Import the service
 import Link from "next/link";
 
 export default function SignupPage() {
@@ -31,30 +32,32 @@ export default function SignupPage() {
     setSuccess("");
 
     try {
-      // Connect to Backend (Port 8081 based on your config)
-      const res = await fetch("http://localhost:8081/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      // --- OLD CODE (DELETED) ---
+      // const res = await fetch("http://localhost:8081/api/auth/signup", ...);
 
-      if (res.ok) {
-        setSuccess("Account created successfully! Redirecting to login...");
-        // Wait 2 seconds then go to login page
-        setTimeout(() => {
-          router.push("/login");
-        }, 2000);
-      } else {
-        const message = await res.text();
-        setError("Signup Failed: " + message);
-      }
+      // --- NEW CODE (CLEANER) ---
+      // 2. Call the service.
+      // It automatically handles the URL, Headers, and JSON conversion.
+      await authService.signup(formData);
+
+      // If code reaches here, it means success (API Service throws error if failed)
+      setSuccess("Account created successfully! Redirecting to login...");
+
+      // Wait 2 seconds then go to login page
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
     } catch (err) {
-      setError("Network Error: Could not connect to the server.");
+      // 3. Catch errors thrown by api.js
+      // err.message contains the text sent from Spring Boot (e.g., "Email already exists")
+      console.error(err);
+      setError("Signup Failed: " + err.message);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // ... (The rest of your JSX remains EXACTLY the same) ...
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
