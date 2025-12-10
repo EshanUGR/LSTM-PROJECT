@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { authService } from "../lib/api";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -17,30 +18,25 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Make sure this port matches your Spring Boot Console (8081 based on your properties)
-      const res = await fetch("http://localhost:8081/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      // --- OLD CODE (DELETED) ---
+      // const res = await fetch(...)
 
-      const responseText = await res.text();
+      // --- NEW CODE (CLEANER) ---
+      // 2. Call the service. It handles the URL and headers for you.
+      const token = await authService.login(email, password);
 
-      if (res.ok) {
-        login(responseText);
-      } else {
-        setError("Invalid email or password. Please try again.");
-      }
+      // 3. Update the global context
+      login(token);
     } catch (err) {
-      setError(
-        "Unable to connect to the server. Please check your connection."
-      );
+      // 4. The service throws an error with the message from the backend
       console.error(err);
+      setError(err.message || "Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // ... (Your UI code below remains EXACTLY the same) ...
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
@@ -84,7 +80,6 @@ export default function LoginPage() {
                 <input
                   type="email"
                   required
-                  // FIXED: Added 'text-gray-900' to force black text
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900 bg-white"
                   placeholder="you@example.com"
                   value={email}
@@ -117,7 +112,6 @@ export default function LoginPage() {
                 <input
                   type="password"
                   required
-                  // FIXED: Added 'text-gray-900' to force black text
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900 bg-white"
                   placeholder="••••••••"
                   value={password}
